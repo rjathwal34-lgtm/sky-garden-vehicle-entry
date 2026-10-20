@@ -1,0 +1,14 @@
+rules_version = '2;
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Replace the placeholder with the UID of your one Firebase Auth user.
+    // This keeps the shared vehicle database limited to that single account.
+    function isTheOneUser() {
+      return request.auth != null
+        && request.auth.uid == 'REPLACE_WITH_YOUR_AUTH_USER_UID';
+    }
+    match /vehicles/{vehicleId} {
+      allow read, create, update, delete: if isTheOneUser();
+    }
+  }
+}

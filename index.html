@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1f5eff">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Sky Garden - Vehicle Entry</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#101828;
+}
+.app{max-width:620px;margin:auto;min-height:100vh;background:#fff}
+header{
+  background:#1f5eff;color:white;padding:26px 20px 24px;
+  position:sticky;top:0;z-index:5;box-shadow:0 2px 10px #0002
+}
+header h1{margin:0;font-size:30px;line-height:1.15}
+header p{margin:7px 0 0;opacity:.95;font-size:16px}
+main{padding:20px}
+.screen{display:block}
+.hidden{display:none!important}
+
+/* HOME */
+.bigMenuButton{
+  width:100%;min-height:180px;border:0;border-radius:22px;margin-bottom:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;color:white;cursor:pointer;box-shadow:0 7px 18px #0002;
+}
+.bigMenuButton span:not(.bigIcon){font-size:28px;font-weight:900;letter-spacing:.5px}
+.bigMenuButton small{font-size:16px;font-weight:500;opacity:.95}
+.bigIcon{font-size:54px}
+.searchButton{background:#1f5eff}
+.addButton{background:#16a05d}
+
+/* COMMON */
+.bigCard{
+  background:#fff;border:2px solid #e0e6ef;border-radius:20px;
+  padding:20px;box-shadow:0 5px 18px #17203310;
+}
+.bigCard h2{font-size:28px;margin:0 0 8px}
+.bigHelp{font-size:17px;line-height:1.45;color:#475467;margin:7px 0 16px}
+.step{
+  display:inline-block;background:#eaf0ff;color:#1749c7;border-radius:20px;
+  padding:7px 12px;font-size:13px;font-weight:900;margin-bottom:13px
+}
+.backButton{
+  width:100%;padding:15px;border:2px solid #d5dce8;background:#fff;
+  border-radius:13px;font-size:18px;font-weight:900;color:#344054;margin-bottom:15px;
+  cursor:pointer
+}
+.bigInput{
+  width:100%;padding:18px 16px;border:2px solid #bfc8d6;border-radius:13px;
+  font-size:22px;font-weight:700;outline:none;background:#fff;
+}
+.bigInput:focus{border-color:#1f5eff;box-shadow:0 0 0 4px #1f5eff18}
+.bigSubmit{
+  width:100%;padding:19px 14px;border:0;border-radius:13px;margin-top:18px;
+  background:#1f5eff;color:#fff;font-size:19px;font-weight:900;cursor:pointer;
+}
+.disabledButton{background:#aeb7c5;cursor:not-allowed}
+.bigLabel{
+  display:block;font-size:21px;font-weight:900;margin-top:22px;margin-bottom:5px
+}
+.optional{
+  color:#667085;font-size:13px;border:1px solid #cbd2dc;border-radius:15px;
+  padding:3px 7px;vertical-align:middle
+}
+.selectedVehicle{
+  background:#f3f6fa;border:2px solid #dbe2eb;border-radius:13px;padding:13px 15px;
+  font-size:13px;color:#667085;margin:15px 0
+}
+.selectedVehicle strong{display:block;color:#101828;font-size:24px;margin-top:3px}
+.choiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choiceGrid button{
+  min-height:70px;border:2px solid #cbd5e1;border-radius:13px;background:#fff;
+  font-size:20px;font-weight:900;cursor:pointer
+}
+.choiceGrid button.selected{background:#1f5eff;color:#fff;border-color:#1f5eff}
+.error{color:#c62828;font-size:16px;font-weight:800;min-height:20px;margin-top:7px}
+.flatStatus{
+  min-height:26px;margin-top:7px;font-size:16px;font-weight:800
+}
+.flatStatus.good{color:#17834a}
+.flatStatus.bad{color:#d92d20}
+.count{font-size:16px;font-weight:700;color:#667085;margin:14px 0 8px}
+.results{margin-top:10px}
+.entry{
+  border:2px solid #dfe5ee;border-radius:15px;padding:16px;margin-top:12px;
+  background:#fbfcff
+}
+.entry-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.vehicle{font-size:25px;font-weight:900;letter-spacing:.5px}
+.type{
+  font-size:13px;background:#eaf0ff;color:#1749c7;padding:7px 9px;border-radius:20px;
+  white-space:nowrap;font-weight:800
+}
+.details{font-size:18px;line-height:1.8;margin-top:9px;color:#344054}
+.empty{text-align:center;color:#667085;padding:25px 5px;font-size:17px}
+.existingEntry{
+  background:#fff8e8;border:2px solid #f0b429;border-radius:15px;
+  padding:15px;margin:14px 0;font-size:17px;line-height:1.65
+}
+.existingEntryTitle{font-size:19px;font-weight:900;color:#9a6700;margin-bottom:5px}
+.deleteButton{
+  width:100%;padding:14px;border:0;border-radius:11px;background:#d92d20;
+  color:#fff;font-size:17px;font-weight:900;cursor:pointer;margin-top:10px
+}
+@media(max-width:380px){
+  main{padding:14px}.bigMenuButton{min-height:155px}
+  .bigMenuButton span:not(.bigIcon){font-size:23px}
+  .bigIcon{font-size:46px}.bigCard h2{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Sky Garden</h1>
+    <p>Vehicle Entry Management</p>
+    <button id="logoutButton" type="button" style="display:none;margin-top:12px;padding:9px 14px;border:1px solid #ffffff88;border-radius:10px;background:#ffffff;color:#1749c7;font-weight:800">LOGOUT</button>
+  </header>
+
+  
+<main>
+  <!-- LOGIN: only manually-created Firebase users can sign in -->
+  <section id="loginScreen" class="screen">
+    <div class="bigCard">
+      <div class="step">AUTHORIZED STAFF ONLY</div>
+      <h2>🔐 STAFF LOGIN</h2>
+      <p class="bigHelp">Sky Garden vehicle records देखने के लिए अपना अधिकृत email और password डालें।</p>
+      <label class="bigLabel" for="loginEmail">EMAIL</label>
+      <input id="loginEmail" class="bigInput" type="email" autocomplete="username" placeholder="staff@example.com">
+      <label class="bigLabel" for="loginPassword">PASSWORD</label>
+      <input id="loginPassword" class="bigInput" type="password" autocomplete="current-password" placeholder="Password">
+      <button id="loginButton" class="bigSubmit" type="button">LOGIN</button>
+      <div id="loginStatus" class="error" role="status"></div>
+      <p class="bigHelp">नया account इस स्क्रीन से नहीं बनेगा। Admin Firebase Console में staff account बनाए।</p>
+    </div>
+  </section>
+
+  <!-- HOME: ONLY TWO BIG OPTIONS -->
+  <section id="homeScreen" class="screen hidden">
+    <button class="bigMenuButton searchButton" onclick="openSearch()">
+      <span class="bigIcon">🔎</span>
+      <span>SEARCH VEHICLE</span>
+      <small>Vehicle number डालकर entry देखें</small>
+    </button>
+
+    <button class="bigMenuButton addButton" onclick="openAdd()">
+      <span class="bigIcon">➕</span>
+      <span>ADD VEHICLE</span>
+      <small>नई vehicle entry जोड़ें</small>
+    </button>
+  </section>
+
+  <!-- ADD: STEP 1 -->
+  <section id="addVehicleScreen" class="screen hidden">
+    <button class="backButton" onclick="goHome()">← HOME</button>
+    <div class="bigCard">
+      <div class="step">STEP 1 OF 2</div>
+      <h2>🚗 VEHICLE NUMBER</h2>
+      <p class="bigHelp">सबसे पहले vehicle का number डालें।</p>
+      <input id="vehicleNo" class="bigInput" placeholder="PB02AB1234" autocomplete="off"
+             oninput="autoCapitalVehicle()">
+
+      <label class="bigLabel">VEHICLE TYPE</label>
+      <p class="bigHelp">Vehicle number के नीचे Car या Bike चुनें।</p>
+      <div id="vehicleTypeGrid" class="choiceGrid">
+        <button type="button" onclick="selectVehicleType('Car')">🚗 CAR</button>
+        <button type="button" onclick="selectVehicleType('Bike')">🏍️ BIKE</button>
+      </div>
+      <div id="vehicleTypeError" class="error"></div>
+
+      <button class="bigSubmit" onclick="submitVehicleNo()">SUBMIT VEHICLE NUMBER</button>
+    </div>
+  </section>
+
+  <!-- ADD: STEP 2 -->
+  <section id="vehicleDetailsScreen" class="screen hidden">
+    <button class="backButton" onclick="openAdd()">← BACK</button>
+    <div class="bigCard">
+      <div class="step">STEP 2 OF 2</div>
+      <h2>🏠 VEHICLE DETAILS</h2>
+
+      <div class="selectedVehicle">
+        VEHICLE NUMBER<br>
+        <strong id="selectedVehicleNo"></strong>
+        <span id="selectedVehicleType" style="display:block;margin-top:8px;font-size:17px;color:#1749c7;font-weight:900"></span>
+      </div>
+
+      <div id="existingEntryBox" class="existingEntry hidden"></div>
+
+      <label class="bigLabel">1. TOWER *</label>
+      <p class="bigHelp">जिस Tower में vehicle है, उसे चुनें।</p>
+      <div id="towerGrid" class="choiceGrid">
+        <button onclick="selectTower('A')">TOWER A</button>
+        <button onclick="selectTower('B')">TOWER B</button>
+        <button onclick="selectTower('C')">TOWER C</button>
+        <button onclick="selectTower('D')">TOWER D</button>
+        <button onclick="selectTower('H')">TOWER H</button>
+        <button onclick="selectTower('I')">TOWER I</button>
+        <button onclick="selectTower('J')">TOWER J</button>
+        <button onclick="selectTower('K')">TOWER K</button>
+      </div>
+      <div id="towerError" class="error"></div>
+
+      <label class="bigLabel">2. FLAT NUMBER *</label>
+      <p class="bigHelp">सिर्फ 101 से 1204 तक के 01–04 flats मान्य हैं।</p>
+      <input id="flat" class="bigInput" inputmode="numeric" maxlength="4"
+             placeholder="जैसे 101, 204, 1204" oninput="validateFlatLive()">
+      <div id="flatStatus" class="flatStatus"></div>
+
+      <label class="bigLabel">3. MOBILE NUMBER <span class="optional">OPTIONAL</span></label>
+      <input id="mobile" class="bigInput" inputmode="numeric" maxlength="10"
+             placeholder="10 digit mobile number (optional)">
+
+      <button id="saveButton" class="bigSubmit disabledButton" onclick="saveVehicle()" disabled>
+        SAVE VEHICLE ENTRY
+      </button>
+    </div>
+  </section>
+
+  <!-- SEARCH -->
+  <section id="searchScreen" class="screen hidden">
+    <button class="backButton" onclick="goHome()">← HOME</button>
+    <div class="bigCard">
+      <h2>🔎 SEARCH VEHICLE</h2>
+      <p class="bigHelp">Vehicle number लिखते ही entry दिखाई देगी।</p>
+      <input id="search" class="bigInput" placeholder="PB02AB1234" autocomplete="off"
+             oninput="renderResults()">
+      <div id="count" class="count"></div>
+      <div id="results" class="results"></div>
+    </div>
+  </section>
+</main>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, onSnapshot, doc, runTransaction, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+// Firebase web config is configured for the Sky Garden project.
+const firebaseConfig = {
+  apiKey: "AIzaSyDiWejkT3PYTKJLDURzpNBDYMr4wmLO0Js",
+  authDomain: "sky-garden-vehicle-entry-62c8e.firebaseapp.com",
+  projectId: "sky-garden-vehicle-entry-62c8e",
+  storageBucket: "sky-garden-vehicle-entry-62c8e.firebasestorage.app",
+  messagingSenderId: "852306315825",
+  appId: "1:852306315825:web:64abfe66670890b2db2310"
+};
+
+const configReady = Object.values(firebaseConfig).every(v => v && !String(v).startsWith("PASTE_"));
+let app, auth, db;
+let entriesCache = [];
+let stopEntriesListener = null;
+let pendingVehicle = "";
+let selectedTower = "";
+let selectedVehicleType = "";
+const VALID_FLATS = [];
+for (let floor=1; floor<=12; floor++) for (let flat=1; flat<=4; flat++) VALID_FLATS.push(String(floor*100+flat));
+
+function getEntries(){ return entriesCache; }
+function normalize(v){ return String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+function showScreen(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden")); document.getElementById(id).classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); }
+function goHome(){ showScreen("homeScreen"); }
+function openAdd(){
+  pendingVehicle=""; selectedTower=""; selectedVehicleType="";
+  document.getElementById("vehicleNo").value=""; document.getElementById("flat").value=""; document.getElementById("mobile").value="";
+  document.getElementById("selectedVehicleNo").textContent=""; document.getElementById("selectedVehicleType").textContent="";
+  document.getElementById("vehicleTypeError").textContent=""; document.getElementById("existingEntryBox").classList.add("hidden"); document.getElementById("existingEntryBox").innerHTML="";
+  document.querySelectorAll("#vehicleTypeGrid button").forEach(b=>b.classList.remove("selected")); document.getElementById("towerError").textContent="";
+  document.getElementById("flatStatus").textContent=""; document.getElementById("flatStatus").className="flatStatus";
+  document.getElementById("saveButton").disabled=true; document.getElementById("saveButton").classList.add("disabledButton");
+  document.querySelectorAll("#towerGrid button").forEach(b=>b.classList.remove("selected")); showScreen("addVehicleScreen");
+}
+function openSearch(){ document.getElementById("search").value=""; renderResults(); showScreen("searchScreen"); setTimeout(()=>document.getElementById("search").focus(),250); }
+function autoCapitalVehicle(){ const input=document.getElementById("vehicleNo"); const pos=input.selectionStart; input.value=input.value.toUpperCase(); try{input.setSelectionRange(pos,pos)}catch(e){} }
+function selectVehicleType(type){ selectedVehicleType=type; document.querySelectorAll("#vehicleTypeGrid button").forEach(b=>b.classList.toggle("selected",b.textContent.includes(type.toUpperCase()))); document.getElementById("vehicleTypeError").textContent=""; }
+function showExistingEntry(vehicle){
+  const box=document.getElementById("existingEntryBox"); const entries=getEntries().filter(e=>normalize(e.vehicleNo)===normalize(vehicle));
+  if(!entries.length){box.classList.add("hidden");box.innerHTML="";return false;}
+  box.classList.remove("hidden");
+  box.innerHTML='<div class="existingEntryTitle">⚠️ इस Vehicle की Entry पहले से मौजूद है</div>'+entries.map(e=>`<div>🚗 Vehicle: <b>${escapeHtml(e.vehicleNo)}</b><br>${e.vehicleType?'🚘 Type: <b>'+escapeHtml(e.vehicleType)+'</b><br>':''}🏢 Tower: <b>${escapeHtml(e.tower)}</b><br>🚪 Flat: <b>${escapeHtml(e.flat)}</b><br>📱 Mobile: <b>${e.mobile?escapeHtml(e.mobile):'Not provided'}</b></div>`).join('<hr>')+'<div style="margin-top:8px">नई duplicate entry बनाने की जरूरत नहीं है।</div>';
+  return true;
+}
+function submitVehicleNo(){
+  autoCapitalVehicle(); const vehicle=document.getElementById("vehicleNo").value.trim().toUpperCase();
+  if(!vehicle){alert("पहले Vehicle Number डालें।");return;} if(vehicle.length<4){alert("Vehicle Number सही तरीके से डालें।");return;}
+  if(!selectedVehicleType){document.getElementById("vehicleTypeError").textContent="⚠️ पहले Car या Bike चुनें।";return;}
+  pendingVehicle=vehicle;
+  if(showExistingEntry(vehicle)){document.getElementById("selectedVehicleNo").textContent=vehicle;document.getElementById("selectedVehicleType").textContent=selectedVehicleType==="Car"?"🚗 CAR":"🏍️ BIKE";showScreen("vehicleDetailsScreen");document.getElementById("saveButton").disabled=true;document.getElementById("saveButton").classList.add("disabledButton");return;}
+  document.getElementById("selectedVehicleNo").textContent=vehicle;document.getElementById("selectedVehicleType").textContent=selectedVehicleType==="Car"?"🚗 CAR":"🏍️ BIKE";showScreen("vehicleDetailsScreen");
+}
+function selectTower(tower){selectedTower=tower;document.querySelectorAll("#towerGrid button").forEach(b=>b.classList.toggle("selected",b.textContent.trim()==="TOWER "+tower));document.getElementById("towerError").textContent="";updateSaveButton();}
+function validateFlatLive(){const input=document.getElementById("flat"),status=document.getElementById("flatStatus"),value=input.value.trim();if(!value){status.textContent="";status.className="flatStatus";updateSaveButton();return;}if(VALID_FLATS.includes(value)){status.textContent="✓ Valid Flat Number";status.className="flatStatus good";}else{status.textContent="✕ Invalid Flat Number — 105, 1301 जैसे numbers allowed नहीं हैं";status.className="flatStatus bad";}updateSaveButton();}
+function updateSaveButton(){const flat=document.getElementById("flat").value.trim(),mobile=document.getElementById("mobile").value.trim(),mobileOK=!mobile||/^\d{10}$/.test(mobile),ok=!!pendingVehicle&&!!selectedTower&&VALID_FLATS.includes(flat)&&mobileOK;const save=document.getElementById("saveButton");save.disabled=!ok;save.classList.toggle("disabledButton",!ok);}
+async function saveVehicle(){
+  const flat=document.getElementById("flat").value.trim(),mobile=document.getElementById("mobile").value.trim();
+  if(!selectedTower){document.getElementById("towerError").textContent="⚠️ पहले Tower चुनें।";return;} if(!VALID_FLATS.includes(flat)){validateFlatLive();return;} if(mobile&&!/^\d{10}$/.test(mobile)){alert("Mobile number 10 digit होना चाहिए।");return;}
+  if(!auth?.currentUser){alert("पहले login करें।");showScreen("loginScreen");return;}
+  const save=document.getElementById("saveButton");save.disabled=true;save.textContent="SAVING...";
+  try{
+    const vehicleId=normalize(pendingVehicle); const ref=doc(db,"vehicles",vehicleId);
+    await runTransaction(db,async tx=>{const existing=await tx.get(ref);if(existing.exists())throw new Error("DUPLICATE_VEHICLE");tx.set(ref,{vehicleNo:pendingVehicle,vehicleType:selectedVehicleType,tower:selectedTower,flat,mobile,createdAt:serverTimestamp(),createdBy:auth.currentUser.uid});});
+    alert("Vehicle Entry Successfully Saved ✓");openSearch();document.getElementById("search").value=pendingVehicle;renderResults();
+  }catch(err){console.error(err);if(err.message==="DUPLICATE_VEHICLE"){alert("इस vehicle की entry किसी दूसरे मोबाइल से भी पहले ही save हो चुकी है। Search से देखें।");openSearch();document.getElementById("search").value=pendingVehicle;renderResults();}else alert("Entry save नहीं हुई। Internet, Firebase config, login और Firestore rules जाँचें।\nDetails: "+(err.code||err.message));}
+  finally{save.textContent="SAVE VEHICLE ENTRY";updateSaveButton();}
+}
+async function deleteEntry(id){if(!confirm("क्या आप इस vehicle की entry delete करना चाहते हैं?"))return;if(!auth?.currentUser){alert("पहले login करें।");return;}try{await deleteDoc(doc(db,"vehicles",id));renderResults();}catch(err){console.error(err);alert("Delete नहीं हुआ। Permission/Internet जाँचें। Details: "+(err.code||err.message));}}
+function renderResults(){const q=normalize(document.getElementById("search").value),all=getEntries(),matches=q?all.filter(e=>normalize(e.vehicleNo).includes(q)):[];document.getElementById("count").textContent=q?`${matches.length} entry${matches.length===1?"":"ies"} मिली`:"";const box=document.getElementById("results");if(!q){box.innerHTML='<div class="empty">ऊपर Vehicle Number डालें।</div>';return;}if(!matches.length){box.innerHTML='<div class="empty">इस Vehicle Number की कोई entry नहीं मिली।</div>';return;}box.innerHTML=matches.map(e=>`<div class="entry"><div class="entry-top"><div class="vehicle">${escapeHtml(e.vehicleNo)}</div><div class="type">${e.vehicleType?escapeHtml(e.vehicleType):"Vehicle"}</div></div><div class="details">🏢 <b>Tower ${escapeHtml(e.tower)}</b><br>🚪 <b>Flat ${escapeHtml(e.flat)}</b><br>📱 <b>${e.mobile?escapeHtml(e.mobile):"Mobile Number नहीं दिया गया"}</b></div><button class="deleteButton" onclick="deleteEntry('${escapeHtml(e.id)}')">✖ CUT / DELETE ENTRY</button></div>`).join("");}
+
+// Keep the original inline HTML buttons working with module JavaScript.
+Object.assign(window,{goHome,openAdd,openSearch,autoCapitalVehicle,selectVehicleType,submitVehicleNo,selectTower,validateFlatLive,updateSaveButton,saveVehicle,deleteEntry,renderResults});
+document.addEventListener("input",e=>{if(e.target.id==="mobile")updateSaveButton();});
+document.getElementById("loginButton").addEventListener("click",async()=>{
+  const email=document.getElementById("loginEmail").value.trim(),password=document.getElementById("loginPassword").value,status=document.getElementById("loginStatus"),button=document.getElementById("loginButton");
+  if(!configReady){status.textContent="पहले Firebase config में PASTE_ वाली सभी values बदलें।";return;}if(!email||!password){status.textContent="Email और password दोनों भरें।";return;}
+  button.disabled=true;status.textContent="Signing in...";try{await signInWithEmailAndPassword(auth,email,password);status.textContent="";}catch(err){console.error(err);status.textContent="Login नहीं हुआ: email/password और Firebase Authentication settings जाँचें ("+(err.code||"error")+")";}finally{button.disabled=false;}
+});
+document.getElementById("logoutButton").addEventListener("click",async()=>{try{await signOut(auth);}catch(e){alert("Logout error: "+e.message);}});
+
+if(!configReady){document.getElementById("loginStatus").textContent="Setup बाकी है: Firebase Console से config copy करके code में डालें।";showScreen("loginScreen");}
+else{
+  try{
+    app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);
+    onAuthStateChanged(auth,user=>{
+      const logout=document.getElementById("logoutButton");logout.style.display=user?"inline-block":"none";
+      if(stopEntriesListener){stopEntriesListener();stopEntriesListener=null;}
+      if(!user){entriesCache=[];showScreen("loginScreen");return;}
+      showScreen("homeScreen");
+      stopEntriesListener=onSnapshot(collection(db,"vehicles"),snap=>{entriesCache=snap.docs.map(d=>({id:d.id,...d.data()}));renderResults();},err=>{console.error(err);alert("Cloud data load नहीं हुआ। Firestore rules और Internet जाँचें: "+(err.code||err.message));});
+    });
+  }catch(err){console.error(err);document.getElementById("loginStatus").textContent="Firebase initialize नहीं हुआ: config जाँचें।";}
+}
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(e=>console.warn("SW registration failed",e)));}
+</script>
+</body>
+</html>
